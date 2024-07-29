@@ -22,7 +22,9 @@ def getPath(): # get full path to target directory
             title = os.path.basename(path)
             print(f"Directory: {path}")
             print(f"title: {title}")
-            return path, title
+            confirmation = input(f"Enter 'y' to continue with directory {path}\n : ")
+            if confirmation == 'y':
+                return path, title
         elif path == "":
             print("Please enter a directory...")
         else:
@@ -49,7 +51,11 @@ def addCustomDir(path, existDir):
 def sortDir(path, title):
     existDir = [] # All existing folders in this directory
     newfCheck = {} # Checklist to determine new folders to be created
-    
+    while True:
+        addTitleCheck = input(f"Append title '{title}'to all files? (y/n): ")
+        if addTitleCheck in ['y', 'n']:
+            break
+
     for file in os.listdir(path):
             # Check for existing folders
             if os.path.isdir(os.path.join(path, file)):
@@ -64,9 +70,10 @@ def sortDir(path, title):
                     newfCheck[file.split('_')[0]] = 1
                 else:
                     newfCheck[file.split('_')[0]] += 1
-                f = '_'.join([title, file])
-                # Prepend files with parent folder's name (Title)
-                os.rename(os.path.join(path, file), os.path.join(path, f))
+                if addTitleCheck == "y":
+                    f = '_'.join([title, file])
+                    # Prepend files with parent folder's name (Title)
+                    os.rename(os.path.join(path, file), os.path.join(path, f))
             else:
                 if file.split('_')[0] in existDir:
                     pass
@@ -119,9 +126,17 @@ def priSort(path, existDir):
             if fileToDir(path, file, existDir):
                 continue
 
-            # for all other documents
-            elif file.endswith((".pdf", ".doc", ".docx", ".rtf", ".xls", ".xlsx", ".ppt", ".pptx")):
-                fileSorting(path, file, "Documents")
+            # for all PDF
+            elif file.endswith((".pdf", ".PDF")):
+                fileSorting(path, file, "PDF")
+            
+            # for all slides
+            elif file.endswith((".ppt", ".pptx")):
+                fileSorting(path, file, "Slides")
+            
+            # for all excel data files
+            elif file.endswith((".xls", ".xlsx", ".csv")):
+                fileSorting(path, file, "CSV/Excel")
             
             # for all other images
             elif file.endswith((".png",".PNG", ".jpeg", ".JPEG", ".jpg", ".JPG")):
@@ -132,7 +147,7 @@ def priSort(path, existDir):
                 fileSorting(path, file, "Notes")
             
             else:
-                fileSorting(path, file, "Documents")
+                fileSorting(path, file, "Others")
 
             # elif file.endswith("[extensions]"):
             #    fileSorting(path, file, "[fileName]")
